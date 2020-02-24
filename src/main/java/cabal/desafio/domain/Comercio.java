@@ -1,33 +1,85 @@
 package cabal.desafio.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-public class Comercio {
+public class Comercio implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Column(nullable=false)
-	@Min(20)
-	@Max(100)
+	@Size(min = 20, max = 100)
 	private String nome;
 	
 	@Id
-	@Column(nullable=false)
+	@Column(nullable=false,unique = true)
 	private long cnpj;
 	
-	@OneToOne(mappedBy="comercio")
+	@OneToOne(mappedBy="comercio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
 	private Endereco endereco;
 	
-	@OneToMany(mappedBy="comercio")
+	@OneToMany(mappedBy="comercio",cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<Telefone> telefones;
 	
-	@OneToMany(mappedBy="comercio")
+	@OneToMany(mappedBy="comercio", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<Email> emails;
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public long getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(long cnpj) {
+		this.cnpj = cnpj;
+	}
+
+	public Endereco getEndereco() {
+		return endereco;
+	}
+
+	public void setEndereco(Endereco endereco) {
+		this.endereco = endereco;
+	}
+
+	public List<Telefone> getTelefones() {
+		return telefones;
+	}
+
+	public void setTelefones(List<Telefone> telefones) {
+		this.telefones = telefones;
+	}
+
+	public List<Email> getEmails() {
+		return emails;
+	}
+
+	public void setEmails(List<Email> emails) {
+		this.emails = emails;
+	}
+	
+	
 }

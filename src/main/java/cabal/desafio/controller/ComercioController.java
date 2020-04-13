@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cabal.desafio.domain.Comercio;
+import cabal.desafio.domain.VoRetornoComercio;
 import cabal.desafio.service.ComercioService;
 
 @RestController()
@@ -28,15 +30,24 @@ public class ComercioController {
 	private ComercioService comercioService;
 
 	@PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Comercio> salvar(@Valid @RequestBody Comercio comercio) {
-
+	public ResponseEntity<VoRetornoComercio> salvar(@Valid @RequestBody Comercio comercio, Errors errors) {
+		
+		VoRetornoComercio voRetorno = new VoRetornoComercio();
+		
+		if(errors.hasErrors()) {
+			voRetorno.setMessage(errors.getFieldErrors().get(0).getDefaultMessage());
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.BAD_REQUEST);
+		}
+		
+		
 		try {
-			comercioService.salvar(comercio);
-			return new ResponseEntity<Comercio>(comercio, HttpStatus.CREATED);
+			comercioService.salvar(comercio);	
+			voRetorno.setMessage("Cadastro realizado com sucesso.");
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.CREATED);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return new ResponseEntity<Comercio>(HttpStatus.NOT_ACCEPTABLE);
+			voRetorno.setMessage(e.getMessage());
+			return new ResponseEntity<VoRetornoComercio>(voRetorno,HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 		
 		
@@ -59,26 +70,37 @@ public class ComercioController {
 	}
 
 	@PutMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Comercio> atualizar(@RequestBody Comercio comercio) {
+	public ResponseEntity<VoRetornoComercio> atualizar(@Valid @RequestBody Comercio comercio, Errors errors) {
+		VoRetornoComercio voRetorno = new VoRetornoComercio();
+		
+		if(errors.hasErrors()) {
+			voRetorno.setMessage(errors.getFieldErrors().get(0).getDefaultMessage());
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.BAD_REQUEST);
+		}
+		
 		try {
 			comercioService.atualizar(comercio);
-			return new ResponseEntity<Comercio>(comercio, HttpStatus.OK);
+			voRetorno.setMessage("Atualizado com sucesso.");
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.OK);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<Comercio>(HttpStatus.NOT_ACCEPTABLE);
+			voRetorno.setMessage(e.getMessage());
+			return new ResponseEntity<VoRetornoComercio>(voRetorno,HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 		
 	}
 
 	@DeleteMapping(value = "/{cnpj}")
-	public ResponseEntity<String> deletarComercio(@PathVariable(value = "cnpj") long cnpj) {
+	public ResponseEntity<VoRetornoComercio> deletarComercio(@PathVariable(value = "cnpj") long cnpj) {
 
+		VoRetornoComercio voRetorno = new VoRetornoComercio();
 		try {
 			comercioService.excluir(cnpj);
-			return new ResponseEntity<String>("Removido com sucesso.", HttpStatus.OK);
+			voRetorno.setMessage("Removido com sucesso.");
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+			voRetorno.setMessage(e.getMessage());
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.NOT_FOUND);
 		}
 
 

@@ -28,7 +28,7 @@ public class Endereco implements Serializable {
 	private long id;
 
 	@Column(nullable = false)
-	private int CEP;
+	private int cep;
 	@Column(nullable = false)
 	private String logradouro;
 	@Column(nullable = false)
@@ -36,7 +36,7 @@ public class Endereco implements Serializable {
 	@Column(nullable = false)
 	private String cidade;
 	@Column(nullable = true)
-	private String UF;
+	private String uf;
 	@Nullable
 	private String complemento;
 
@@ -53,12 +53,22 @@ public class Endereco implements Serializable {
 		this.id = id;
 	}
 
-	public int getCEP() {
-		return CEP;
+	
+
+	public int getCep() {
+		return cep;
 	}
 
-	public void setCEP(int cEP) {
-		CEP = cEP;
+	public void setCep(int cep) {
+		this.cep = cep;
+	}
+
+	public String getUf() {
+		return uf;
+	}
+
+	public void setUf(String uf) {
+		this.uf = uf;
 	}
 
 	public String getLogradouro() {
@@ -83,14 +93,6 @@ public class Endereco implements Serializable {
 
 	public void setCidade(String cidade) {
 		this.cidade = cidade;
-	}
-
-	public String getUF() {
-		return UF;
-	}
-
-	public void setUF(String uF) {
-		UF = uF;
 	}
 
 	public String getComplemento() {

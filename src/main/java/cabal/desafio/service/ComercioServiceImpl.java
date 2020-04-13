@@ -1,12 +1,20 @@
 package cabal.desafio.service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cabal.desafio.domain.Comercio;
+import cabal.desafio.domain.Email;
+import cabal.desafio.domain.Endereco;
+import cabal.desafio.domain.Telefone;
 import cabal.desafio.repository.ComercioRepository;
+import cabal.desafio.repository.EmailRepository;
+import cabal.desafio.repository.EnderecoRepository;
+import cabal.desafio.repository.TelefoneRepository;
 import cabal.desafio.utils.ValidaCNPJ;
 
 @Service
@@ -16,13 +24,13 @@ public class ComercioServiceImpl implements ComercioService {
 	private ComercioRepository comercioRepository;
 
 	@Autowired
-	private EmailService emailService;
+	private EmailRepository emailRepository;
 
 	@Autowired
-	private TelefoneService TelefoneService;
+	private EnderecoRepository enderecoRepository;
 
 	@Autowired
-	private EnderecoService enderecoService;
+	private TelefoneRepository telefoneRepository;
 
 	public void salvar(Comercio comercio) throws Exception {
 
@@ -47,13 +55,15 @@ public class ComercioServiceImpl implements ComercioService {
 
 		try {
 			validaEntidade(comercio);
-			if (comercioRepository.findById(comercio.getCnpj()) != null) {
+			if (comercioRepository.findById(comercio.getCnpj()).isPresent()) {
 				// Atualiza primeiro as tabelas que contém chave estrangeira
-				comercio.getEmails().stream().forEach(email -> emailService.atualizar(email));
-				comercio.getTelefones().stream().forEach(telefone -> TelefoneService.atualizar(telefone));
-				enderecoService.atualizar(comercio.getEndereco());
+				comercio.getEmails().stream().forEach(email -> atualizar(email));
+				comercio.getTelefones().stream().forEach(telefone -> atualizar(telefone));
+				atualizar(comercio.getEndereco());
 
 				comercioRepository.save(comercio);
+			} else {
+				throw new Exception("Comercio não cadastrado.");
 			}
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
@@ -62,11 +72,12 @@ public class ComercioServiceImpl implements ComercioService {
 	}
 
 	public void excluir(long cnpj) throws Exception {
+
 		try {
+			comercioRepository.findById(cnpj).get();
 			comercioRepository.deleteById(cnpj);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e.getMessage());
+		} catch (NoSuchElementException e1) {
+			throw new NoSuchElementException("Não foi encontrado registros para esse CNPJ");
 		}
 	}
 
@@ -78,12 +89,37 @@ public class ComercioServiceImpl implements ComercioService {
 			throw new Exception("CNPJ não é válido.");
 		}
 
-		if (comercio.getEmails().isEmpty() || comercio.getEmails() == null)
+		if (comercio.getEmails() == null || comercio.getEmails().isEmpty()) {
 			throw new Exception("Pelo menos um e-mail deve ser informado.");
+		}
 
 		if (comercio.getTelefones() == null || comercio.getTelefones().isEmpty()) {
 			throw new Exception("Pelo menos um telefone deve ser informado");
+		} else { // Tem telefone
+			comercio.getTelefones().stream().forEach(telefone -> {
+				String[] tiposTelefone = { "RESIDENCIAL", "COMERCIAL", "CELULAR" };
+				List<String> list = Arrays.asList(tiposTelefone);
+				if (!list.contains(telefone.getTipoTelefone())) {
+//						throw new Exception("Telefone deve ser: RESIDENCIAL,COMERCIAL ou CELULAR");
+				}
+			});
 		}
+
+	}
+
+	@Override
+	public void atualizar(Email email) {
+		emailRepository.save(email);
+	}
+
+	@Override
+	public void atualizar(Endereco endereco) {
+		enderecoRepository.save(endereco);
+	}
+
+	@Override
+	public void atualizar(Telefone telefone) {
+		telefoneRepository.save(telefone);
 	}
 
 }

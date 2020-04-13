@@ -1,14 +1,21 @@
 package cabal.desafio.service;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import cabal.desafio.domain.Comercio;
@@ -16,6 +23,9 @@ import cabal.desafio.domain.Email;
 import cabal.desafio.domain.Endereco;
 import cabal.desafio.domain.Telefone;
 import cabal.desafio.repository.ComercioRepository;
+import cabal.desafio.repository.EmailRepository;
+import cabal.desafio.repository.EnderecoRepository;
+import cabal.desafio.repository.TelefoneRepository;
 
 public class ComercioServiceTest {
 
@@ -26,13 +36,13 @@ public class ComercioServiceTest {
 	ComercioRepository comercioRepository;
 
 	@Mock
-	EmailServiceImpl emailService;
+	EmailRepository emailRepository;
 
 	@Mock
-	TelefoneServiceImpl telefoneServiceImpl;
+	TelefoneRepository telefoneRepository;
 
 	@Mock
-	EnderecoServiceImpl enderecoServiceImpl;
+	EnderecoRepository enderecoRepository;
 
 	@Before
 	public void init() {
@@ -40,25 +50,26 @@ public class ComercioServiceTest {
 	}
 
 	@Test
-	public void criaComercioSemNome() throws Exception {
-
+	public void criarComercioComSucesso() throws Exception {
 		Comercio comercio = getComercio();
 
-		comercio.setNome("");
-
+		Mockito.when(comercioRepository.save(comercio)).thenReturn(comercio);
+				
 		comercioService.salvar(comercio);
-
-		assertNull(comercioService.pesquisarPorCNPJ(comercio.getCnpj()));
 	}
 
-	@Test(expected = Exception.class)
-	public void criaComercioComCnpjInvalido() throws Exception {
+
+	@Test
+	public void criaComercioComCnpjIncorreto() throws Exception {
 
 		Comercio comercio = getComercio();
 
-		comercio.setCnpj(23213211L);
-
-		comercioService.salvar(comercio);
+		//CNPJ inválido
+		comercio.setCnpj(12345L);;
+		
+		assertThrows(Exception.class, () -> {
+			comercioService.salvar(comercio);
+		});
 	}
 	
 	@Test(expected = Exception.class)
@@ -82,34 +93,91 @@ public class ComercioServiceTest {
 	}
 	
 	@Test
-	public void alterarComercio() throws Exception {
+	public void alterarComercioExistente() throws Exception {
 
 		Comercio comercio = getComercio();
+		
+		Mockito.when(comercioRepository.findById(comercio.getCnpj())).thenReturn(Optional.of(comercio));
 
 		comercioService.atualizar(comercio);
+
+	}
+
+	@Test
+	public void alterarComercioNaoExistente() throws Exception {
+
+		Comercio comercio = getComercio();
+		
+		Mockito.when(comercioRepository.findById(comercio.getCnpj())).thenReturn(Optional.empty());
+
+		assertThrows(Exception.class, () ->{
+			comercioService.atualizar(comercio);
+		});
+
+	}
+	
+	@Test
+	public void listarComercios() {
+		List<Comercio> comercios = new ArrayList<Comercio>();
+		
+		Comercio comercio1 = getComercio();
+		Comercio comercio2 = getComercio();
+		comercio2.setCnpj(52659578000158L);
+		Comercio comercio3 = getComercio();
+		comercio3.setCnpj(44872443000148L);
+		
+		comercios.add(comercio1);
+		comercios.add(comercio2);
+		comercios.add(comercio3);
+		
+		Mockito.when(comercioRepository.findAll()).thenReturn(comercios);
+
+		List<Comercio> expectedComercios = comercioService.listarComercio();
+		
+		assertEquals(expectedComercios, comercios);
 		
 	}
 	
-	@Test(expected = Exception.class)
-	public void alterarComercioSemTelefone() throws Exception {
-
+	@Test
+	public void pesquisarComercioExistente() {
+		
 		Comercio comercio = getComercio();
-
-		comercio.setTelefones(null);
 		
-		comercioService.atualizar(comercio);
+		Mockito.when(comercioRepository.findById(comercio.getCnpj())).thenReturn(Optional.of(comercio));
 		
+		Comercio expectedComercio = comercioService.pesquisarPorCNPJ(comercio.getCnpj());
+		
+		assertNotNull(expectedComercio);
 	}
-
-	@Test(expected = Exception.class)
-	public void alterarComercioSemEmail() throws Exception {
-
+	
+	@Test
+	public void pesquisarComercioInexistente() {
+		
 		Comercio comercio = getComercio();
-
-		comercio.setEmails(null);
 		
-		comercioService.atualizar(comercio);
+		Mockito.when(comercioRepository.findById(comercio.getCnpj())).thenReturn(Optional.empty());
 		
+		Comercio expectedComercio = comercioService.pesquisarPorCNPJ(comercio.getCnpj());
+		
+		assertNull(expectedComercio);
+	}
+	
+	@Test
+	public void excluirComercioExistente() throws Exception {
+		
+		Mockito.when(comercioRepository.findById(getComercio().getCnpj())).thenReturn(Optional.of(getComercio()));
+		
+		comercioService.excluir(getComercio().getCnpj());
+	}
+	
+	@Test
+	public void excluirComercioInexistente() throws Exception {
+		
+		Mockito.when(comercioRepository.findById(getComercio().getCnpj())).thenReturn(Optional.empty());
+		
+		assertThrows(NoSuchElementException.class, () -> {
+			comercioService.excluir(getComercio().getCnpj());
+		});
 	}
 	
 	private Comercio getComercio() {
@@ -126,11 +194,11 @@ public class ComercioServiceTest {
 		telefones.add(telefone1);
 
 		Endereco endereco = new Endereco();
-		endereco.setCEP(71908720);
+		endereco.setCep(71908720);
 		endereco.setLogradouro("Rua das Pitanguerias Res. Easy");
 		endereco.setBairro("Norte");
 		endereco.setCidade("Águas Claras");
-		endereco.setUF("DF");
+		endereco.setUf("DF");
 
 		Email email1 = new Email();
 		email1.setEmail("matheus.fontinele@cabal.com.br");

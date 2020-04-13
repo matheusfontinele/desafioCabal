@@ -39,8 +39,8 @@ public class DomainTest {
 
 		endereco.setBairro("Bairro");
 		endereco.getBairro();
-		endereco.setCEP(3245555);
-		endereco.getCEP();
+		endereco.setCep(3245555);
+		endereco.getCep();
 		endereco.setCidade("BRASILIA");
 		endereco.getCidade();
 		Comercio comercio = new Comercio();
@@ -52,7 +52,7 @@ public class DomainTest {
 		endereco.getId();
 		endereco.setLogradouro("Logradouro de teste");
 		endereco.getLogradouro();
-		endereco.setUF("DF");
-		endereco.getUF();
+		endereco.setUf("DF");
+		endereco.getUf();
 	}
 }

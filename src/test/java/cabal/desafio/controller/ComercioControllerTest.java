@@ -36,7 +36,8 @@ public class ComercioControllerTest<MockMvc>{
 		
 		comercio.setNome("");
 		
-		comercioController.salvar(comercio);		
+		
+		comercioController.salvar(comercio, null);		
 	}
 	
 	@Test
@@ -55,7 +56,7 @@ public class ComercioControllerTest<MockMvc>{
 
 		Comercio comercio = getComercio();
 		
-		comercioController.atualizar(comercio);		
+		comercioController.atualizar(comercio, null);		
 	}
 	
 //	@Test
@@ -88,11 +89,11 @@ public class ComercioControllerTest<MockMvc>{
 		telefones.add(telefone1);
 		
 		Endereco endereco = new Endereco();
-		endereco.setCEP(71908720);
+		endereco.setCep(71908720);
 		endereco.setLogradouro("Rua das Pitanguerias Res. Easy");
 		endereco.setBairro("Norte");
 		endereco.setCidade("Águas Claras");
-		endereco.setUF("DF");
+		endereco.setUf("DF");
 		
 		Email email1 = new Email();
 		email1.setEmail("matheus.fontinele@cabal.com.br");

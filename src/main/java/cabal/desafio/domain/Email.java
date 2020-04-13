@@ -25,6 +25,7 @@ public class Email implements Serializable{
 	private long id;
 	
 	@Column
+	@javax.validation.constraints.Email(message = "Email deve ser válido")
 	private String email;
 	
 	@ManyToOne()

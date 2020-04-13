@@ -10,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -21,12 +23,14 @@ public class Comercio implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	@Column(nullable=false)
-	@Size(min = 20, max = 100)
+	@Size(min = 20, max = 100, message = "Nome deve ter entre 20 e 100 caracteres")
 	private String nome;
 	
 	@Id
 	@Column(nullable=false,unique = true)
+	@NotNull(message = "CNPJ não pode ser nulo")
 	private long cnpj;
 	
 	@OneToOne(mappedBy="comercio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

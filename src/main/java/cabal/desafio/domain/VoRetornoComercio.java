@@ -2,8 +2,6 @@ package cabal.desafio.domain;
 
 import java.util.Date;
 
-import com.sun.jmx.snmp.Timestamp;
-
 public class VoRetornoComercio {
 	
 	private String message;
@@ -11,7 +9,7 @@ public class VoRetornoComercio {
 	private Date timestamp;
 	
 	public VoRetornoComercio() {
-		timestamp = new Timestamp().getDate();
+		timestamp = new Date();
 	}
 
 	public String getMessage() {

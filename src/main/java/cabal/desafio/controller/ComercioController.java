@@ -33,8 +33,8 @@ public class ComercioController {
 	public ResponseEntity<VoRetornoComercio> salvar(@Valid @RequestBody Comercio comercio, Errors errors) {
 		
 		VoRetornoComercio voRetorno = new VoRetornoComercio();
-		
-		if(errors.hasErrors()) {
+
+		if(errors != null && errors.hasErrors()) {
 			voRetorno.setMessage(errors.getFieldErrors().get(0).getDefaultMessage());
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.BAD_REQUEST);
 		}
@@ -73,7 +73,7 @@ public class ComercioController {
 	public ResponseEntity<VoRetornoComercio> atualizar(@Valid @RequestBody Comercio comercio, Errors errors) {
 		VoRetornoComercio voRetorno = new VoRetornoComercio();
 		
-		if(errors.hasErrors()) {
+		if(errors != null && errors.hasErrors()) {
 			voRetorno.setMessage(errors.getFieldErrors().get(0).getDefaultMessage());
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.BAD_REQUEST);
 		}

@@ -8,7 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MapsId;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import org.springframework.lang.Nullable;
@@ -41,7 +41,7 @@ public class Endereco implements Serializable {
 	private String complemento;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@MapsId
+	@JoinColumn(name = "comercio_id")
 	@JsonBackReference
 	private Comercio comercio;
 

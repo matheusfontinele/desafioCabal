@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import cabal.desafio.domain.Comercio;
 
-public interface ComercioRepository extends CrudRepository<Comercio, Long>{
+public interface ComercioRepository extends CrudRepository<Comercio, String>{
 
 }

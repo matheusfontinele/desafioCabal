@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -24,10 +26,11 @@ public class Telefone implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column
+	@Column(nullable = false)
 	private String tipoTelefone;
 	
-	@Column
+	@Column(nullable = false)
+	@NotEmpty(message = "Pelo menos um telefone deve ser informado")
 	private String numero;
 	
 	@ManyToOne()

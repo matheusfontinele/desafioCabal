@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -26,6 +27,7 @@ public class Email implements Serializable{
 	
 	@Column
 	@javax.validation.constraints.Email(message = "Email deve ser válido")
+	@NotEmpty(message = "Pelo menos um email deve ser informado")
 	private String email;
 	
 	@ManyToOne()

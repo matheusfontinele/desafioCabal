@@ -1,6 +1,7 @@
 package cabal.desafio.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -31,28 +32,26 @@ public class ComercioController {
 
 	@PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<VoRetornoComercio> salvar(@Valid @RequestBody Comercio comercio, Errors errors) {
-		
+
 		VoRetornoComercio voRetorno = new VoRetornoComercio();
 
-		if(errors != null && errors.hasErrors()) {
+		if (errors != null && errors.hasErrors()) {
 			voRetorno.setMessage(errors.getFieldErrors().get(0).getDefaultMessage());
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.BAD_REQUEST);
 		}
-		
-		
+
 		try {
-			comercioService.salvar(comercio);	
+			comercioService.salvar(comercio);
 			voRetorno.setMessage("Cadastro realizado com sucesso.");
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.CREATED);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			voRetorno.setMessage(e.getMessage());
-			return new ResponseEntity<VoRetornoComercio>(voRetorno,HttpStatus.UNPROCESSABLE_ENTITY);
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
-		
-		
-	}
 
+	}
+	
 	@GetMapping(value = "/")
 	public List<Comercio> listarComercios() {
 
@@ -60,39 +59,40 @@ public class ComercioController {
 	}
 
 	@GetMapping(value = "/{cnpj}")
-	public ResponseEntity<Comercio> getComercio(@PathVariable long cnpj) {
-		Comercio comercio = comercioService.pesquisarPorCNPJ(cnpj);
-		if (comercio == null) {
+	public ResponseEntity<Comercio> getComercio(@PathVariable String cnpj) {
+		Optional<Comercio> comercio = comercioService.pesquisarPorCNPJ(cnpj);
+		
+		if (!comercio.isPresent()) {
 			return new ResponseEntity<Comercio>(HttpStatus.NOT_FOUND);
 		}
-
-		return new ResponseEntity<Comercio>(comercio, HttpStatus.OK);
+		return new ResponseEntity<Comercio>(comercio.get(), HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<VoRetornoComercio> atualizar(@Valid @RequestBody Comercio comercio, Errors errors) {
+	public ResponseEntity<VoRetornoComercio> atualizar(@Valid @RequestBody Comercio comercio,  Errors errors) {
 		VoRetornoComercio voRetorno = new VoRetornoComercio();
-		
-		if(errors != null && errors.hasErrors()) {
+
+		if (errors != null && errors.hasErrors()) {
 			voRetorno.setMessage(errors.getFieldErrors().get(0).getDefaultMessage());
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.BAD_REQUEST);
 		}
-		
+
 		try {
 			comercioService.atualizar(comercio);
 			voRetorno.setMessage("Atualizado com sucesso.");
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.OK);
 		} catch (Exception e) {
 			voRetorno.setMessage(e.getMessage());
-			return new ResponseEntity<VoRetornoComercio>(voRetorno,HttpStatus.UNPROCESSABLE_ENTITY);
+			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
-		
+
 	}
 
 	@DeleteMapping(value = "/{cnpj}")
-	public ResponseEntity<VoRetornoComercio> deletarComercio(@PathVariable(value = "cnpj") long cnpj) {
+	public ResponseEntity<VoRetornoComercio> deletarComercio(@PathVariable(value = "cnpj") String cnpj) {
 
 		VoRetornoComercio voRetorno = new VoRetornoComercio();
+
 		try {
 			comercioService.excluir(cnpj);
 			voRetorno.setMessage("Removido com sucesso.");
@@ -102,7 +102,6 @@ public class ComercioController {
 			voRetorno.setMessage(e.getMessage());
 			return new ResponseEntity<VoRetornoComercio>(voRetorno, HttpStatus.NOT_FOUND);
 		}
-
 
 	}
 

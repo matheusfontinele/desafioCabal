@@ -10,9 +10,10 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.br.CNPJ;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -31,7 +32,8 @@ public class Comercio implements Serializable {
 	@Id
 	@Column(nullable=false,unique = true)
 	@NotNull(message = "CNPJ não pode ser nulo")
-	private long cnpj;
+	@CNPJ(message = "CNPJ inválido")
+	private String cnpj;
 	
 	@OneToOne(mappedBy="comercio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonManagedReference
@@ -53,11 +55,11 @@ public class Comercio implements Serializable {
 		this.nome = nome;
 	}
 
-	public long getCnpj() {
+	public String getCnpj() {
 		return cnpj;
 	}
 
-	public void setCnpj(long cnpj) {
+	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
 
